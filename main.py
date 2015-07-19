@@ -29,13 +29,20 @@ def dist_beacon(rssi, beacon_id):
     ref_rssi = [-56, -58, -58]
     return dist_rssi(rssi, ref_rssi[beacon_id - 1])
 
+def rssi_filter(rssi, prev_rssi):
+    alpha = 0.5
+    return alpha * rssi + (1 - alpha)* prev_rssi 
+    
 def get_positions(fname):
     data = load_data(fname)
     last_distance = [0, 0, 0]
     beacon_pos = [(0, 0), (5, 0), (0, 4)]
+    prev_rssi = 0
     positions = []
     for d in data:
         (t, beacon_id, rssi, _) = d
+        rssi = rssi_filter(rssi, prev_rssi)
+        prev_rssi = rssi
         newdist = dist_beacon(rssi, beacon_id)
         if newdist < 5:
             last_distance[beacon_id - 1] =  newdist
