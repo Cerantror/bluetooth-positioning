@@ -20,7 +20,9 @@ AD_Data_Proximity_Type="be ac"    # AltBeacon advertisement code.  Big endian re
 AD_Data_ID1="00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00"    # Organizational identifier as 16-byte UUID value
 AD_Data_ID2="00 01"    # Beacon Group as 2-byte value
 AD_Data_ID3="00 01"    # Beacon Unit as 2-byte value
-AD_Data_Reference_RSSI="c5"    # Signed 1-byte value representing the average received signal strength at 1m from the advertiser
+
+# c9 for dancsi-dell, and ??? for renan
+AD_Data_Reference_RSSI="c9"    # Signed 1-byte value representing the average received signal strength at 1m from the advertiser
 AD_Data_Manufacturer_Reserved="01"    # Reserved for use by manufacturer to implement special features
 
 # Set up advertising data flags
@@ -51,7 +53,7 @@ sudo hciconfig $BLUETOOTH_DEVICE noleadv
 # Command parameters: Advertising_Data_Length (1f), Advertising_Data
 sudo hcitool -i $BLUETOOTH_DEVICE cmd 0x08 0x0008 1f $AD_Flags $AltBeacon_Advertisement
 
-# Start LE advertising (non-connectable)
-sudo hciconfig $BLUETOOTH_DEVICE leadv 3
+sudo hcitool -i hci0 cmd 0x08 0x0006 A0 00 A0 00 03 00 00 00 00 00 00 00 00 07 00
+sudo hcitool -i hci0 cmd 0x08 0x000a 01
 
 
