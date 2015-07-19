@@ -52,6 +52,8 @@ y = [p[1] for p in pos]
 plt.plot(x, y)
 plt.show()
 
+#sample comment
+
 p = load_data('log3.txt')
 for i in range(3):
     plt.plot([dist_beacon(d[2], d[1]) for d in p if i+1 == d[1]])
