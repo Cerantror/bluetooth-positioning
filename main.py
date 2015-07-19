@@ -1,3 +1,5 @@
+import numpy as np
+
 def load_data(fname):
     f = open(fname,'r')
     scanned = []
@@ -30,38 +32,54 @@ def dist_beacon(rssi, beacon_id):
     return dist_rssi(rssi, ref_rssi[beacon_id - 1])
 
 def rssi_filter(rssi, prev_rssi):
-    alpha = 0.5
+    alpha = 0.2
     return alpha * rssi + (1 - alpha)* prev_rssi 
+    
+room_dimensions = (3, 5.5) 
     
 def get_positions(fname):
     data = load_data(fname)
     last_distance = [0, 0, 0]
-    beacon_pos = [(0, 0), (5, 0), (0, 4)]
+    beacon_pos = [(0, 0), (0, 5.5), (3, 0)]
     prev_rssi = 0
     positions = []
+    filtered = []
     for d in data:
-        (t, beacon_id, rssi, _) = d
+        (t, beacon_id, rssi, dist) = d
         rssi = rssi_filter(rssi, prev_rssi)
         prev_rssi = rssi
+        if beacon_id == 2:
+            filtered.append(rssi)
         newdist = dist_beacon(rssi, beacon_id)
+        #newdist = dist
         if newdist < 5:
             last_distance[beacon_id - 1] =  newdist
         #print(last_distance)
         pos = trilaterate (last_distance, beacon_pos)
         positions.append(pos)
+    plt.plot(filtered)    
+    plt.show()
     return positions
     
 #%matplotlib inline
 from matplotlib import pyplot as plt
-pos = get_positions('log3.txt')
+from matplotlib import cm
+
+plt.clf();
+
+pos = get_positions('logpoint.txt')
 x = [p[0] for p in pos]
 y = [p[1] for p in pos]
-plt.plot(x, y)
+heatmap, xedges, yedges = np.histogram2d(x, y, bins=50)
+extent = [0, room_dimensions[0], 0, room_dimensions[1]]
+
+plt.clf()
+plt.imshow(heatmap, extent=extent, cmap = cm.YlOrRd)
 plt.show()
 
 #sample comment
 
-p = load_data('log3.txt')
+p = load_data('logpoint.txt')
 for i in range(3):
     plt.plot([dist_beacon(d[2], d[1]) for d in p if i+1 == d[1]])
 plt.show()
